@@ -38,16 +38,32 @@ public class Piece : MonoBehaviour , IPointerDownHandler, IDragHandler, IPointer
     }
 
 
-    void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData)
     {
-
+        PanelBoard.Instance.OnPointerDown(eventData, this);
     }
-    void IDragHandler.OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData eventData)
     {
-
+        PanelBoard.Instance.OnDrag(eventData, this);
     }
-    void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
+    public void OnPointerUp(PointerEventData eventData)
     {
+        PanelBoard.Instance.OnPointerup(eventData, this);
+    }
 
+    public void DestroyPiece()
+    {
+        StartCoroutine(DesolvePiece());
+    }
+
+    IEnumerator DesolvePiece()
+    {
+        while(m_transform.localScale.x > 0.2f)
+        {
+            float value = 2f * Time.deltaTime;
+            m_transform.localScale = m_transform.localScale - new Vector3(value, value, value);
+            yield return null;
+        }
+        Destroy(gameObject);
     }
 }

@@ -28,7 +28,7 @@ public class PieceMoveManager : MonoBehaviour
         }
     }
 
-    void AddMoveEvent(PieceMoveEvent moveEvent)
+    public void AddMoveEvent(PieceMoveEvent moveEvent)
     {
         mEventList.Add(moveEvent);
     }
