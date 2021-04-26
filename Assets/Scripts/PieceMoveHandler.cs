@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+
 // Piece의 움직임 처리
 public class PieceMoveHandler
 {
@@ -11,7 +12,9 @@ public class PieceMoveHandler
     public float moveSpeed;
 
     bool isEnd;
+
     public bool IsEnd() { return isEnd; }
+
     public PieceMoveHandler(Piece movePiece, Node targetNode, float moveSpeed = 16f)
     {
         this.movePiece = movePiece;
@@ -38,8 +41,11 @@ public class PieceMoveHandler
         }
     }
 }
+
+
 // Piece의 움직임 처리를 따로 해주게 되면 전체 움직임이 끝났을 경우에 대한 묶음 처리가 어려움
 // 따라서 해당 event에 같은 속성의 Piece 움직임을 묶어서 등록
+
 
 public class PieceMoveEvent
 {
@@ -48,6 +54,7 @@ public class PieceMoveEvent
     public event MoveEnd<PieceMoveHandler> EventMoveEnd;
 
     List<PieceMoveHandler> mHandlerList = new List<PieceMoveHandler>();
+
 
     public bool Update()
     {

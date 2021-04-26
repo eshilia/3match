@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 
 // Piece 드래그처리 해줄 구조체
+
 public struct PieceDragHandler
 {
     const float maxDistance = 12f;
@@ -14,15 +15,19 @@ public struct PieceDragHandler
     public Vector2 originPosition;
     public Node originNode;
 
+
     public bool IsNull()
     {
         return targetPiece == null;
     }
+
+
     public void Reset()
     {
         targetPiece = null;
         originPosition = Vector2.zero;
     }
+
 
     public void Set(Piece piece, Node node)
     {
@@ -37,8 +42,8 @@ public struct PieceDragHandler
     public void OnDrag(PointerEventData eventData)
     {
         Vector2 direction = eventData.position - originPosition;
-        Vector2 absDirection = new Vector2();
 
+        Vector2 absDirection = new Vector2();
         absDirection.x = Mathf.Abs(direction.x);
         absDirection.y = Mathf.Abs(direction.y);
 
