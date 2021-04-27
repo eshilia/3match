@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
+using DG.Tweening;
 
 /**********************************************************************************
  * Piece가 차있는 보드를 관리하는 클래스
@@ -16,7 +17,7 @@ public class PanelBoard : MonoBehaviour
     static PanelBoard sInstance;
     public static PanelBoard Instance { get { return sInstance; } }
     //셀 사이즈
-    [Header("CrateInfo")]
+    [Header("CreateInfo")]
     [SerializeField] float m_cellSize = 64f;
     //스프라이트 리소스
     [Header("Resource")]
@@ -32,6 +33,7 @@ public class PanelBoard : MonoBehaviour
     float mBlankHeight;
     float mStartX;
     float mStartY;
+    bool m_CheckCreate = false;
 
     //드래그 관리해 줄 구조체
     PieceDragHandler mDragHanlder = new PieceDragHandler();
@@ -45,7 +47,10 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     private void Start()
     {
+
         CreateBoard();
+        DOTween.Init();
+
     }
 
     //--------------------------------------------------------------------------------
@@ -133,32 +138,79 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     void CreateBoard()
     {
-        //Piece 프리팹 로드
-        mPrefabPiece = Resources.Load("Prefabs/Piece") as GameObject;
-        //현재 보드 Transform
-        RectTransform boardTransform = GetComponent<RectTransform>();
-        //가로,세로 셀 수 
-        mCellWidthCount = (int)(boardTransform.sizeDelta.x / m_cellSize);
-        mCellHeightCount = (int)(boardTransform.sizeDelta.y / m_cellSize);
-        //가로,세로 셀을 배치하고 남는 여백
-        mBlankWidth = (boardTransform.sizeDelta.x % m_cellSize) * 0.5f;
-        mBlankHeight = (boardTransform.sizeDelta.y % m_cellSize) * 0.5f;
-        //시작지점
-        mStartX = -boardTransform.sizeDelta.x * 0.5f + mBlankWidth + m_cellSize * 0.5f;
-        mStartY = boardTransform.sizeDelta.y * 0.5f - mBlankHeight - m_cellSize * 0.5f;
-
-        //그리드로 사용할 노드
-        mNodeList = new Node[mCellHeightCount, mCellWidthCount];
-        //퍼즐 조각들 생성 시작
-        for (int y = 0; y < mCellHeightCount; ++y)
+        if (m_CheckCreate == false)
         {
-            for (int x = 0; x < mCellWidthCount; ++x)
+            //Piece 프리팹 로드
+            mPrefabPiece = Resources.Load("Prefabs/Piece") as GameObject;
+            //현재 보드 Transform
+            RectTransform boardTransform = GetComponent<RectTransform>();
+            //가로,세로 셀 수 
+            mCellWidthCount = (int)(boardTransform.sizeDelta.x / m_cellSize);
+            mCellHeightCount = (int)(boardTransform.sizeDelta.y / m_cellSize);
+            //가로,세로 셀을 배치하고 남는 여백
+            mBlankWidth = (boardTransform.sizeDelta.x % m_cellSize) * 0.5f;
+            mBlankHeight = (boardTransform.sizeDelta.y % m_cellSize) * 0.5f;
+            //시작지점
+            mStartX = -boardTransform.sizeDelta.x * 0.5f + mBlankWidth + m_cellSize * 0.5f;
+            mStartY = boardTransform.sizeDelta.y * 0.5f - mBlankHeight - m_cellSize * 0.5f;
+
+            //그리드로 사용할 노드
+            mNodeList = new Node[mCellHeightCount, mCellWidthCount];
+            //퍼즐 조각들 생성 시작
+            for (int y = 0; y < mCellHeightCount; ++y)
             {
-                //새로운 Piece 생성
-                Vector2 position = new Vector2(mStartX + m_cellSize * x, mStartY - m_cellSize * y);
-                Piece newPiece = CreateRandomPiece(new Index(x, y), position);
-                //노드도 해당 위치에 생성
-                mNodeList[y, x] = new Node(x, y, newPiece.rectTransform.anchoredPosition, newPiece);
+                for (int x = 0; x < mCellWidthCount; ++x)
+                {
+                    //새로운 Piece 생성
+                    Vector2 position = new Vector2(mStartX + m_cellSize * x, mStartY - m_cellSize * y);
+                    Piece newPiece = CreateRandomPiece(new Index(x, y), position);
+                    //노드도 해당 위치에 생성
+                    mNodeList[y, x] = new Node(x, y, newPiece.rectTransform.anchoredPosition, newPiece);
+                }
+            }
+        }
+        
+        //결과 반환할 Result
+        List<Node> result = new List<Node>()
+
+        //검사할 방향
+        Index[] arrayDirection = new Index[4];
+        arrayDirection[0] = Index.left;
+        arrayDirection[1] = Index.right;
+        arrayDirection[2] = Index.top;
+        arrayDirection[3] = Index.bottom;
+
+
+        for(int x = 1; x < mCellWidthCount; ++x)
+        {
+            for(int y = 1; y < mCellHeightCount; ++y)
+            {
+                for (int i = 0; i < 4; i += 2)
+                {
+                    //left,right,up,down 식으로 배열이 이루어져 있으므로 양방향 검사 한번에 하기위해서 이렇게 처리
+                    Index[] directions = new Index[2];
+                    directions[0] = arrayDirection[i];
+                    directions[1] = arrayDirection[i + 1];
+                    //매치된 수 
+                    int matchCount = 0;
+                    List<Node> line = new List<Node>();
+                    for (int j = 0; j < directions.Length; ++j)
+                    {
+                        Index temp = new Index(x,y);
+                        Index index = Index.Add(temp, directions[j]);
+                        Node node = GetNode(index);
+                        if (node != null && node.piece != null && node.piece.pieceType == GetPieceType(temp))
+                        {
+                            ++matchCount;
+                            line.Add(node);
+                        }
+                    }
+
+                    if (matchCount >= 2)
+                    {
+                        MergeNodeList(result, line);
+                    }
+                }
             }
         }
     }
@@ -247,6 +299,7 @@ public class PanelBoard : MonoBehaviour
 
         //드래깅 끝났으므로 Reset 
         mDragHanlder.Reset();
+        //targetPiece.transform.DOPunchScale(Vector3.one, 0.5f, 1);
         Debug.Log("OnPointerUp : " + targetPiece.name);
     }
 
@@ -261,6 +314,10 @@ public class PanelBoard : MonoBehaviour
         //aPiece는 bNode로, bPiece는 aNode로 이동
         moveEvent.AddMoveHandler(new PieceMoveHandler(aPiece, b));
         moveEvent.AddMoveHandler(new PieceMoveHandler(bPiece, a));
+
+        //aPiece.transform.DOPunchScale(Vector3.one, 0.4f , 2 ,3);
+        //bPiece.transform.DOPunchScale(Vector3.one, 0.4f , 2 ,3);
+
         //해당 Piece들 이동할 Node에 바인딩
         SetPieceToNode(bPiece, a);
         SetPieceToNode(aPiece, b);
@@ -334,6 +391,8 @@ public class PanelBoard : MonoBehaviour
             DestroyPiece(matchList[i]);
         }
     }
+
+
 
     //--------------------------------------------------------------------------------
     //매치된 Piece들 검사
@@ -415,6 +474,20 @@ public class PanelBoard : MonoBehaviour
             }
         }
         // }}
+
+        for(int i =0; i < result.Count; ++i)
+        {
+
+            //if (result[i].piece.transform.DOComplete() == 1)
+            //    break;
+            result[i].piece.transform.DOPunchScale(Vector3.one, 0.4f, 4, 3);
+            Piece startPiece = GetPiece(startIndex);
+            //if (startPiece.transform.DOComplete() == 1)
+            //    startPiece.transform.DOPunchScale(Vector3.one, 0.2f, 4, 3);
+
+        }
+
+        
 
         //매치된 결과가 있다면 시작 노드 추가
         if (result.Count != 0)
