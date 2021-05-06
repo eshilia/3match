@@ -169,50 +169,7 @@ public class PanelBoard : MonoBehaviour
                 }
             }
         }
-        
-        //결과 반환할 Result
-        List<Node> result = new List<Node>()
 
-        //검사할 방향
-        Index[] arrayDirection = new Index[4];
-        arrayDirection[0] = Index.left;
-        arrayDirection[1] = Index.right;
-        arrayDirection[2] = Index.top;
-        arrayDirection[3] = Index.bottom;
-
-
-        for(int x = 1; x < mCellWidthCount; ++x)
-        {
-            for(int y = 1; y < mCellHeightCount; ++y)
-            {
-                for (int i = 0; i < 4; i += 2)
-                {
-                    //left,right,up,down 식으로 배열이 이루어져 있으므로 양방향 검사 한번에 하기위해서 이렇게 처리
-                    Index[] directions = new Index[2];
-                    directions[0] = arrayDirection[i];
-                    directions[1] = arrayDirection[i + 1];
-                    //매치된 수 
-                    int matchCount = 0;
-                    List<Node> line = new List<Node>();
-                    for (int j = 0; j < directions.Length; ++j)
-                    {
-                        Index temp = new Index(x,y);
-                        Index index = Index.Add(temp, directions[j]);
-                        Node node = GetNode(index);
-                        if (node != null && node.piece != null && node.piece.pieceType == GetPieceType(temp))
-                        {
-                            ++matchCount;
-                            line.Add(node);
-                        }
-                    }
-
-                    if (matchCount >= 2)
-                    {
-                        MergeNodeList(result, line);
-                    }
-                }
-            }
-        }
     }
 
     //--------------------------------------------------------------------------------
@@ -389,6 +346,7 @@ public class PanelBoard : MonoBehaviour
         for (int i = 0; i < matchList.Count; ++i)
         {
             DestroyPiece(matchList[i]);
+
         }
     }
 
@@ -475,17 +433,17 @@ public class PanelBoard : MonoBehaviour
         }
         // }}
 
-        for(int i =0; i < result.Count; ++i)
-        {
+        //for(int i =0; i < result.Count; ++i)
+        //{
 
-            //if (result[i].piece.transform.DOComplete() == 1)
-            //    break;
-            result[i].piece.transform.DOPunchScale(Vector3.one, 0.4f, 4, 3);
-            Piece startPiece = GetPiece(startIndex);
-            //if (startPiece.transform.DOComplete() == 1)
-            //    startPiece.transform.DOPunchScale(Vector3.one, 0.2f, 4, 3);
+        //    //if (result[i].piece.transform.DOComplete() == 1)
+        //    //    break;
+        //    result[i].piece.transform.DOPunchScale(Vector3.one, 0.4f, 4, 3);
+        //    Piece startPiece = GetPiece(startIndex);
+        //    //if (startPiece.transform.DOComplete() == 1)
+        //    //    startPiece.transform.DOPunchScale(Vector3.one, 0.2f, 4, 3);
 
-        }
+        //}
 
         
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public enum PieceType
 {
@@ -20,14 +21,6 @@ public enum PieceType
     Null = 10
 
 
-
-    //Cat = 0,
-    //Dog = 1,
-    //Mouse = 2,
-    //Panda = 3,
-    //Rabbit = 4,
-    //Null =5
-
 }
 
 
@@ -39,7 +32,7 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerU
     Image mImage;
     RectTransform mTransform;
     Index mIndex;
-
+    Effect m_effect;
     public RectTransform rectTransform { get { return mTransform; } }
     public PieceType pieceType { get { return m_pieceType; } }
     public Index index { get { return mIndex; } set { mIndex = value; } }
@@ -53,6 +46,7 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerU
         m_pieceType = pieceType;
         mImage.sprite = sprite;
         mIndex = index;
+
     }
 
     //--------------------------------------------------------------------------------
@@ -83,13 +77,20 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerU
     //--------------------------------------------------------------------------------
     IEnumerator DesolvePiece()
     {
-        while (mTransform.localScale.x > 0.2f)
+        while (transform.localScale.x < 1.6f)
         {
             float value = 2f * Time.deltaTime;
-            mTransform.localScale = mTransform.localScale - new Vector3(value, value, value);
+            this.transform.DOPunchScale(Vector3.one, 0.5f);
+            //mTransform.localScale = mTransform.localScale - new Vector3(value, value, value);
             yield return null;
         }
+        if (this.gameObject != null)
+        {
+            //m_effect.GetComponent<Effect>().CreatEffect(this.transform);
+            Effect.instance.CreatEffect(this.transform);
+            Destroy(gameObject);
+        }
 
-        Destroy(gameObject);
+
     }
 }
