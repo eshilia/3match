@@ -40,12 +40,10 @@ public class Effect : MonoBehaviour
 
     public void CreatEffect(Transform a)
     {
-        m_PrefabEffect = Resources.Load("Prefabs/Smoke") as GameObject;
-        GameObject obj = Instantiate(m_PrefabEffect, a.position, Quaternion.Euler(0f,0f,0f));
-        //obj.transform.localScale = new Vector3(2f,2f,2f);
-        //obj.transform.position = a.position;
-        //obj.transform.position = Vector3.back;
-        Debug.Log("터져요!");
+        //m_PrefabEffect = Resources.Load("Prefabs/Smoke") as GameObject;
+        //GameObject obj = Instantiate(m_PrefabEffect, a.position, Quaternion.Euler(0f,0f,1f));
+
+        //Debug.Log("터져요!");
     }
 
     //void InitPosition()

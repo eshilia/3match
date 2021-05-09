@@ -14,6 +14,7 @@ public struct Index
         this.y = y;
     }
 
+
     //--------------------------------------------------------------------------------
     public Index(Vector2 vector2)
     {
@@ -38,4 +39,5 @@ public struct Index
     public static Index left { get { return new Index(-1, 0); } }
     public static Index top { get { return new Index(0, -1); } }
     public static Index bottom { get { return new Index(0, 1); } }
+
 }

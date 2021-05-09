@@ -33,7 +33,9 @@ public class PanelBoard : MonoBehaviour
     float mBlankHeight;
     float mStartX;
     float mStartY;
-    bool m_CheckCreate = false;
+    int mScore;
+    bool mIsCreateCheck = false;
+    public bool misCreateCheck { get { return mIsCreateCheck; } }
 
     //드래그 관리해 줄 구조체
     PieceDragHandler mDragHanlder = new PieceDragHandler();
@@ -56,6 +58,14 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     private void Update()
     {
+        if (mIsCreateCheck == false)
+        {
+            CreateCheck();
+        }
+        else if (mIsCreateCheck == true)
+        {
+            //UIManager.instance.RequestScoreText("");
+        }
         UpdateGravity();
     }
 
@@ -138,8 +148,7 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     void CreateBoard()
     {
-        if (m_CheckCreate == false)
-        {
+
             //Piece 프리팹 로드
             mPrefabPiece = Resources.Load("Prefabs/Piece") as GameObject;
             //현재 보드 Transform
@@ -168,8 +177,7 @@ public class PanelBoard : MonoBehaviour
                     mNodeList[y, x] = new Node(x, y, newPiece.rectTransform.anchoredPosition, newPiece);
                 }
             }
-        }
-
+        
     }
 
     //--------------------------------------------------------------------------------
@@ -521,5 +529,69 @@ public class PanelBoard : MonoBehaviour
 
         node.piece.DestroyPiece();
         node.piece = null;
+    }
+    
+    void CreateCheck()
+    {
+
+        //검사할 방향
+        Index[] arrayDirection = new Index[4];
+        arrayDirection[0] = Index.left;
+        arrayDirection[1] = Index.right;
+        arrayDirection[2] = Index.top;
+        arrayDirection[3] = Index.bottom;
+
+        for(int y = 0; y < mCellHeightCount; ++y)
+        {
+            for(int x = 0; x < mCellWidthCount; ++x)
+            {
+                Index tempIndex = new Index(x, y);
+
+                //{{ 각 방향으로 매치 검사 ~
+                for (int i = 0; i < arrayDirection.Length; ++i)
+                {
+                    List<Node> line = new List<Node>();
+                    //가로 검사냐 세로 검사냐에 따라 최대 셀 수가 달라짐
+                    int maxCellCount = arrayDirection[i].x != 0 ? mCellWidthCount : mCellHeightCount;
+
+                    int matchCount = 0; //매치된 수
+                                        //해당 방향으로 검사
+                    for (int j = 1; j < maxCellCount; ++j)
+                    {
+                        Index nextIndex = Index.Add(tempIndex, Index.Mul(arrayDirection[i], j));
+                        //같은 타입이라면
+                        if (GetPieceType(nextIndex) == GetPieceType(tempIndex))
+                        {
+                            //추가
+                            Node node = GetNode(nextIndex);
+                            line.Add(node);
+                            ++matchCount;
+                        }
+                        //아니라면 해당 방향으로 검사 그만
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //3매치가 되었다면 지워주고 다시 생성
+                    if (matchCount >= 2)
+                    {
+                        mIsCreateCheck = false;
+                        GetPiece(tempIndex).DestroyPiece();
+                        //CreateBoard();
+                    }
+
+
+                }
+            }
+        }
+        //안되었다면 게임 시작 가능.
+        mIsCreateCheck = true;
+    }
+    void AddScore()
+    {
+        mScore = 0;
+        if (mIsCreateCheck == true)
+            mScore += 1;
     }
 }
