@@ -33,8 +33,11 @@ public class PanelBoard : MonoBehaviour
     float mBlankHeight;
     float mStartX;
     float mStartY;
-    int mScore;
+    int mScore = 0;
+    int mCombo = 0;
     bool mIsCreateCheck = false;
+    bool mIsStart = false;
+    bool mIsComboCheck = false;
     public bool misCreateCheck { get { return mIsCreateCheck; } }
 
     //드래그 관리해 줄 구조체
@@ -62,11 +65,16 @@ public class PanelBoard : MonoBehaviour
         {
             CreateCheck();
         }
-        else if (mIsCreateCheck == true)
+        else if (mIsStart == true)
         {
-            //UIManager.instance.RequestScoreText("");
+            UIManager.instance.RequestScoreText(mScore);
         }
         UpdateGravity();
+        if(mIsComboCheck == true)
+        {
+            UIManager.instance.RequestComboText(mCombo);
+            mIsComboCheck = false;
+        }
     }
 
     //--------------------------------------------------------------------------------
@@ -149,34 +157,34 @@ public class PanelBoard : MonoBehaviour
     void CreateBoard()
     {
 
-            //Piece 프리팹 로드
-            mPrefabPiece = Resources.Load("Prefabs/Piece") as GameObject;
-            //현재 보드 Transform
-            RectTransform boardTransform = GetComponent<RectTransform>();
-            //가로,세로 셀 수 
-            mCellWidthCount = (int)(boardTransform.sizeDelta.x / m_cellSize);
-            mCellHeightCount = (int)(boardTransform.sizeDelta.y / m_cellSize);
-            //가로,세로 셀을 배치하고 남는 여백
-            mBlankWidth = (boardTransform.sizeDelta.x % m_cellSize) * 0.5f;
-            mBlankHeight = (boardTransform.sizeDelta.y % m_cellSize) * 0.5f;
-            //시작지점
-            mStartX = -boardTransform.sizeDelta.x * 0.5f + mBlankWidth + m_cellSize * 0.5f;
-            mStartY = boardTransform.sizeDelta.y * 0.5f - mBlankHeight - m_cellSize * 0.5f;
+        //Piece 프리팹 로드
+        mPrefabPiece = Resources.Load("Prefabs/Piece") as GameObject;
+        //현재 보드 Transform
+        RectTransform boardTransform = GetComponent<RectTransform>();
+        //가로,세로 셀 수 
+        mCellWidthCount = (int)(boardTransform.sizeDelta.x / m_cellSize);
+        mCellHeightCount = (int)(boardTransform.sizeDelta.y / m_cellSize);
+        //가로,세로 셀을 배치하고 남는 여백
+        mBlankWidth = (boardTransform.sizeDelta.x % m_cellSize) * 0.5f;
+        mBlankHeight = (boardTransform.sizeDelta.y % m_cellSize) * 0.5f;
+        //시작지점
+        mStartX = -boardTransform.sizeDelta.x * 0.5f + mBlankWidth + m_cellSize * 0.5f;
+        mStartY = boardTransform.sizeDelta.y * 0.5f - mBlankHeight - m_cellSize * 0.5f;
 
-            //그리드로 사용할 노드
-            mNodeList = new Node[mCellHeightCount, mCellWidthCount];
-            //퍼즐 조각들 생성 시작
-            for (int y = 0; y < mCellHeightCount; ++y)
+        //그리드로 사용할 노드
+        mNodeList = new Node[mCellHeightCount, mCellWidthCount];
+        //퍼즐 조각들 생성 시작
+        for (int y = 0; y < mCellHeightCount; ++y)
+        {
+            for (int x = 0; x < mCellWidthCount; ++x)
             {
-                for (int x = 0; x < mCellWidthCount; ++x)
-                {
-                    //새로운 Piece 생성
-                    Vector2 position = new Vector2(mStartX + m_cellSize * x, mStartY - m_cellSize * y);
-                    Piece newPiece = CreateRandomPiece(new Index(x, y), position);
-                    //노드도 해당 위치에 생성
-                    mNodeList[y, x] = new Node(x, y, newPiece.rectTransform.anchoredPosition, newPiece);
-                }
+                //새로운 Piece 생성
+                Vector2 position = new Vector2(mStartX + m_cellSize * x, mStartY - m_cellSize * y);
+                Piece newPiece = CreateRandomPiece(new Index(x, y), position);
+                //노드도 해당 위치에 생성
+                mNodeList[y, x] = new Node(x, y, newPiece.rectTransform.anchoredPosition, newPiece);
             }
+        }
         
     }
 
@@ -207,6 +215,7 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     public void OnPointerDown(PointerEventData eventData, Piece targetPiece)
     {
+        mIsStart = true;
         //움직이는 Piece가 존재한다면 return 
         if (PieceMoveManager.Instance.HasMoveEvent())
             return;
@@ -237,6 +246,7 @@ public class PanelBoard : MonoBehaviour
     //--------------------------------------------------------------------------------
     public void OnPointerUp(PointerEventData eventData, Piece targetPiece)
     {
+
         if (mDragHanlder.IsNull())
             return;
 
@@ -254,12 +264,16 @@ public class PanelBoard : MonoBehaviour
         {
             //스왑
             MoveToSwap(mDragHanlder.originNode, GetNode(swapIndex));
+            //콤보체크 시작
+            mIsComboCheck = true;
         }
         //스왑할 지점이 보드 밖이라면
         else
         {
             //Piece 다시 원래 자리로 세팅
             mDragHanlder.targetPiece.rectTransform.anchoredPosition = mDragHanlder.originNode.position;
+            //콤보체크 해제
+            mIsComboCheck = false;
         }
 
         //드래깅 끝났으므로 Reset 
@@ -310,6 +324,9 @@ public class PanelBoard : MonoBehaviour
         //매치된게 없다면 다시 되돌려야 함
         if (matchList.Count == 0)
         {
+            //콤보 체크 해제
+            mIsComboCheck = false;
+
             //스왑으로 이동했으므로 moveList는 2개 
             PieceMoveEvent moveEvent = new PieceMoveEvent();
 
@@ -328,6 +345,10 @@ public class PanelBoard : MonoBehaviour
         }
         else
         {
+
+            //콤보체크 재시작
+            mIsComboCheck = true;
+
             //매치된 리스트들 전부 삭제
             for (int i = 0; i < matchList.Count; ++i)
             {
@@ -354,7 +375,6 @@ public class PanelBoard : MonoBehaviour
         for (int i = 0; i < matchList.Count; ++i)
         {
             DestroyPiece(matchList[i]);
-
         }
     }
 
@@ -463,6 +483,7 @@ public class PanelBoard : MonoBehaviour
                 result.Add(GetNode(startIndex));
         }
 
+        
         return result;
     }
 
@@ -588,10 +609,15 @@ public class PanelBoard : MonoBehaviour
         //안되었다면 게임 시작 가능.
         mIsCreateCheck = true;
     }
-    void AddScore()
+    public void AddScore()
     {
-        mScore = 0;
-        if (mIsCreateCheck == true)
+        if (mIsStart == true)
             mScore += 1;
+    }
+
+    public void AddCombo()
+    {
+        if (mIsComboCheck == true)
+            mCombo += 1;
     }
 }

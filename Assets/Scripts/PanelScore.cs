@@ -6,17 +6,14 @@ using UnityEngine.UI;
 public class PanelScore : MonoBehaviour
 {
     GameObject m_scoreTextPrefab;
-
     private void Start()
     {
         m_scoreTextPrefab = Resources.Load("Prefabs/ScoreText") as GameObject;
     }
-    public void RequestScoreText(string str)
+    public void RequestScoreText(int i)
     {
-        if(PanelBoard.Instance.misCreateCheck == true)
-        {
-            GameObject newObject = Instantiate(m_scoreTextPrefab, transform);
-            newObject.GetComponent<Text>().text = str;
-        }
+        GameObject newObject = Instantiate(m_scoreTextPrefab, transform);
+        newObject.GetComponent<Text>().text = "Score" + i * 100;
+        
     }
 }

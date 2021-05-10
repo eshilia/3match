@@ -88,8 +88,8 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerU
         if (this.gameObject != null)
         {
             //m_effect.GetComponent<Effect>().CreatEffect(this.transform);
-            Effect.instance.CreatEffect(this.transform);
-
+            //Effect.instance.CreatEffect(this.transform);
+            PanelBoard.Instance.AddScore();
             Destroy(gameObject);
         }
     }
