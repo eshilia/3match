@@ -310,6 +310,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6922595523438618657, guid: 5b0f64b3c053b8744bbab18672f94612,
+        type: 3}
+      propertyPath: m_Text
+      value: 'Score : 0'
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b0f64b3c053b8744bbab18672f94612, type: 3}
 --- !u!224 &1157101721 stripped
@@ -399,7 +404,17 @@ PrefabInstance:
     - target: {fileID: 8441782844866388284, guid: c0947218fb999b143b2383654cd72824,
         type: 3}
       propertyPath: m_Text
-      value: f56rf65ftt
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8441782844866388284, guid: c0947218fb999b143b2383654cd72824,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8441782844866388284, guid: c0947218fb999b143b2383654cd72824,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8441782844866388286, guid: c0947218fb999b143b2383654cd72824,
         type: 3}
@@ -707,6 +722,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4365592320037425468, guid: 645da1674f2849e429e461c191c5c105,
+        type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 720
+      objectReference: {fileID: 0}
+    - target: {fileID: 4365592320037425468, guid: 645da1674f2849e429e461c191c5c105,
+        type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1280
       objectReference: {fileID: 0}
     - target: {fileID: 4365592320037425470, guid: 645da1674f2849e429e461c191c5c105,
         type: 3}

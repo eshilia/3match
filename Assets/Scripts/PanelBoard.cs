@@ -47,6 +47,8 @@ public class PanelBoard : MonoBehaviour
     private void Awake()
     {
         sInstance = this;
+        //Screen.SetResolution(1080, 1920, true);
+        //Screen.SetResolution(Screen.width, Screen.width * 9 /16, true);
     }
 
     //--------------------------------------------------------------------------------
@@ -55,7 +57,7 @@ public class PanelBoard : MonoBehaviour
 
         CreateBoard();
         DOTween.Init();
-
+        
     }
 
     //--------------------------------------------------------------------------------
@@ -70,10 +72,9 @@ public class PanelBoard : MonoBehaviour
             UIManager.instance.RequestScoreText(mScore);
         }
         UpdateGravity();
-        if(mIsComboCheck == true)
+        if(mIsComboCheck == true && mCombo > 2)
         {
             UIManager.instance.RequestComboText(mCombo);
-            mIsComboCheck = false;
         }
     }
 
@@ -265,7 +266,7 @@ public class PanelBoard : MonoBehaviour
             //스왑
             MoveToSwap(mDragHanlder.originNode, GetNode(swapIndex));
             //콤보체크 시작
-            mIsComboCheck = true;
+            //mIsComboCheck = true;
         }
         //스왑할 지점이 보드 밖이라면
         else
@@ -273,13 +274,15 @@ public class PanelBoard : MonoBehaviour
             //Piece 다시 원래 자리로 세팅
             mDragHanlder.targetPiece.rectTransform.anchoredPosition = mDragHanlder.originNode.position;
             //콤보체크 해제
-            mIsComboCheck = false;
+            //mIsComboCheck = false;
         }
 
         //드래깅 끝났으므로 Reset 
         mDragHanlder.Reset();
         //targetPiece.transform.DOPunchScale(Vector3.one, 0.5f, 1);
         Debug.Log("OnPointerUp : " + targetPiece.name);
+        
+        
     }
 
     //--------------------------------------------------------------------------------
@@ -325,7 +328,7 @@ public class PanelBoard : MonoBehaviour
         if (matchList.Count == 0)
         {
             //콤보 체크 해제
-            mIsComboCheck = false;
+            //mIsComboCheck = false;
 
             //스왑으로 이동했으므로 moveList는 2개 
             PieceMoveEvent moveEvent = new PieceMoveEvent();
@@ -347,7 +350,7 @@ public class PanelBoard : MonoBehaviour
         {
 
             //콤보체크 재시작
-            mIsComboCheck = true;
+           //mIsComboCheck = true;
 
             //매치된 리스트들 전부 삭제
             for (int i = 0; i < matchList.Count; ++i)

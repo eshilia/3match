@@ -77,18 +77,15 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerU
     //--------------------------------------------------------------------------------
     IEnumerator DesolvePiece()
     {
-        while (transform.localScale.x < 1.1f)
+        while (transform.localScale.x < 1.2f)
         {
-            //float value = 2f * Time.deltaTime;
+            Vector3 punch = new Vector3(2, 2, 2);
             if (this.gameObject != null)
-                this.transform.DOPunchScale(Vector3.one, 1f);
-            //mTransform.localScale = mTransform.localScale - new Vector3(value, value, value);
+                this.transform.DOPunchScale(punch, 2f, 2);
             yield return new WaitForSeconds(0.1f); 
         }
         if (this.gameObject != null)
         {
-            //m_effect.GetComponent<Effect>().CreatEffect(this.transform);
-            //Effect.instance.CreatEffect(this.transform);
             PanelBoard.Instance.AddScore();
             Destroy(gameObject);
         }
